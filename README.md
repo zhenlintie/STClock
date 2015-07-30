@@ -4,7 +4,7 @@
 
 仅实现了`计时器`功能
 
-![](https://github.com/zhenlintie/STClockDemo/raw/master/clock.gif)
+![](https://github.com/zhenlintie/STClock/raw/master/clock.gif)
 
 ## 第三方
 
