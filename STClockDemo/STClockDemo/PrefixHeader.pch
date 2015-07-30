@@ -1,0 +1,25 @@
+//
+//  PrefixHeader.pch
+//  STClockDemo
+//
+//  Created by zhenlintie on 15/7/27.
+//  Copyright (c) 2015年 sTeven. All rights reserved.
+//
+
+#ifndef STClock_PrefixHeader_pch
+#define STClock_PrefixHeader_pch
+
+#ifdef __OBJC__
+
+#import "UIView+STUtils.h"
+#import "UIColor+STUtils.h"
+#import "STTimeManager.h"
+
+#define STCLOCK_BG_COLOR STRGB(253, 253, 253)
+#define STCLOCK_TEXT_COLOR STRGB(137, 140, 149)
+
+#define STCLOCK_ALPHA_ANIMATION_DURATION 0.3
+
+#endif
+
+#endif
