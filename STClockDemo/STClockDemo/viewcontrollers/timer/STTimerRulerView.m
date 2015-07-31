@@ -65,6 +65,86 @@
     [self.rulerView addGestureRecognizer:self.pan];
 }
 
+
+
+#pragma mark - animation
+
+- (void)animateToShow{
+    _rulerView.alpha = 1;
+    _topShadowView.alpha = 1;
+    
+    CGPoint position = CGPointMake(_rulerView.center.x, [self rulerTopWithSecond:_second]+_rulerView.height/2);
+    CGPoint toPosition = CGPointMake(position.x, MIN(_rulerView.height/2,position.y+15));
+    
+    _rulerView.layer.position = CGPointMake(position.x, [self rulerHeight]/2-_rulerView.height);
+    
+    [_rulerView.layer pop_removeAllAnimations];
+    [_rulerView positionTo:toPosition
+                  duration:0.3
+            timingFumction:STCustomEaseOut
+                completion:^(BOOL finished) {
+                    [_rulerView positionTo:position
+                                  duration:0.2
+                            timingFumction:STLinear
+                                completion:nil];
+                }];
+}
+
+- (void)animateToHide{
+    [_rulerView.layer pop_removeAllAnimations];
+    CGPoint position = _rulerView.layer.position;
+    [_rulerView positionTo:CGPointMake(position.x, -_rulerView.height/2) duration:STCLOCK_ALPHA_ANIMATION_DURATION
+            timingFumction:STEaseInOut
+                completion:nil];
+    [_topShadowView alphaTo:0 duration:STCLOCK_ALPHA_ANIMATION_DURATION
+                 completion:nil];
+}
+
+- (void)resetRuler{
+    _second = 0;
+    [_rulerView positionTo:CGPointMake(_rulerView.center.x, _rulerView.height/2-[self rulerHeight])
+                  duration:STCLOCK_ALPHA_ANIMATION_DURATION
+            timingFumction:STEaseOut
+                completion:^(BOOL finished) {
+                    _loopView.animationImages = _loopImages;
+                    _loopView.animationRepeatCount = 1;
+                    _loopView.animationDuration = 0.6;
+                    [_loopView startAnimating];
+                }];
+}
+
+#pragma mark - ruler
+
+- (CGFloat)rulerHeight{
+    return self.rulerView.height-self.loopView.height;
+}
+
+- (CGFloat)rulerTopWithSecond:(NSInteger)second{
+    return -(1-second/3600.0)*([self rulerHeight]);
+}
+
+- (CGFloat)rulerRatio{
+    return 1-(0-self.rulerView.top)/([self rulerHeight]);
+}
+
+- (void)setSecond:(NSInteger)second{
+    _second = second;
+    self.rulerView.top = [self rulerTopWithSecond:second];
+}
+
+- (void)updateSecond{
+    _second = (int)floor([self rulerRatio]*3600);
+    [self.delegate slideToSecond:self.second];
+}
+
+- (void)updateMinute{
+    NSInteger minute = (int)floor([self rulerRatio]*60);
+    [self.delegate didBeginAtMinute:minute];
+    self.rulerView.top = -(1-minute/60.0)*([self rulerHeight]);
+}
+
+#pragma mark - gesture
+
 - (void)panned{
     switch (_pan.state) {
         case UIGestureRecognizerStateBegan:{
@@ -72,7 +152,7 @@
         }
         case UIGestureRecognizerStateChanged:{
             CGFloat offset = [_pan translationInView:self].y;
-            self.rulerView.top = MAX(-(self.rulerView.height-self.loopView.height), MIN(0, self.rulerView.top+offset));
+            self.rulerView.top = MAX(-[self rulerHeight], MIN(0, self.rulerView.top+offset));
             [_pan setTranslation:CGPointZero inView:self];
             
             [self updateSecond];
@@ -86,71 +166,6 @@
         default:
             break;
     }
-}
-
-- (CGFloat)rulerHeight{
-    return self.rulerView.height-self.loopView.height;
-}
-
-- (CGFloat)rulerRatio{
-    return 1-(0-self.rulerView.top)/([self rulerHeight]);
-}
-
-- (void)updateToSecond:(NSInteger)second{
-    self.rulerView.top = -(1-second/3600.0)*([self rulerHeight]);
-}
-
-- (void)updateSecond{
-    [self.delegate slideToSecond:(int)floor([self rulerRatio]*3600)];
-}
-
-- (void)updateMinute{
-    NSInteger minute = (int)floor([self rulerRatio]*60);
-    [self.delegate didBeginAtMinute:minute];
-    self.rulerView.top = -(1-minute/60.0)*([self rulerHeight]);
-}
-
-- (void)animateToShow{
-    _rulerView.alpha = 1;
-    _topShadowView.alpha = 1;
-    
-    CGPoint position = _rulerView.layer.position;
-    CGPoint toPosition = CGPointMake(position.x, MIN(_rulerView.height/2,position.y+15));
-    
-    _rulerView.layer.position = CGPointMake(position.x, [self rulerHeight]/2-_rulerView.height);
-    
-    [_rulerView positionTo:toPosition duration:0.35 timingFumction:STCustomEaseOut
-                completion:^(BOOL finished) {
-                    [_rulerView positionTo:position
-                                  duration:0.2
-                            timingFumction:STLinear
-                                completion:nil];
-                }];
-}
-
-- (void)animateToHide{
-    CGPoint position = _rulerView.layer.position;
-    [_rulerView positionTo:CGPointMake(position.x, -_rulerView.height/2) duration:0.3
-            timingFumction:STEaseInOut
-                completion:^(BOOL finished) {
-                    _rulerView.layer.position = position;
-                }];
-    [_topShadowView alphaTo:0 duration:0.3
-                 completion:^(BOOL finished) {
-                     _topShadowView.alpha = 1;
-                 }];
-}
-
-- (void)resetRuler{
-    [_rulerView positionTo:CGPointMake(_rulerView.center.x, _rulerView.height/2-[self rulerHeight])
-                  duration:0.3
-            timingFumction:STEaseOut
-                completion:^(BOOL finished) {
-                    _loopView.animationImages = _loopImages;
-                    _loopView.animationRepeatCount = 1;
-                    _loopView.animationDuration = 0.7;
-                    [_loopView startAnimating];
-                }];
 }
 
 @end

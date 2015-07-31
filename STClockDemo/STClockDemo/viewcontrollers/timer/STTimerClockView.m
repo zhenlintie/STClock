@@ -32,6 +32,8 @@
 
 @implementation STTimerClockView{
     NSInteger _leftSecond;
+    NSInteger _leftTime;
+    
     BOOL _canUpdateTimeDown;
     BOOL _pause;
     CGFloat _handAngleBeforeShow;
@@ -40,6 +42,7 @@
 - (instancetype)initWithFrame:(CGRect)frame{
     if (self = [super initWithFrame:frame]){
         _leftSecond = 0;
+        _leftTime = 0;
         _canUpdateTimeDown = YES;
         _pause = NO;
     }
@@ -69,7 +72,7 @@
     self.timeLabel.textColor = STRGB(172, 89, 89);
     self.timeLabel.font = st_font(23);
     self.timeLabel.textAlignment = NSTextAlignmentCenter;
-    self.timeLabel.text = @"00:00";
+    self.timeLabel.text = @"00:00.00";
     [self addSubview:self.timeLabel];
     
     self.rulerView = [[STTimerRulerView alloc] initWithFrame:CGRectMake(self.width-73, 44, 70, self.height-44)];
@@ -177,12 +180,12 @@
 
 - (void)resetButtonClicked:(UIButton *)button{
     [self stopTime];
-    self.timeLabel.text = @"00:00";
+    self.timeLabel.text = @"00:00.00";
     
     [self.rulerView resetRuler];
     [self animateControlButtonsToShow:NO];
     
-    [@[self.hand, self.handShadow] rotateFrom:[self angleOfHandBySecond:_leftSecond] to:0 duration:0.2 timingFumction:STEaseOut completion:nil];
+    [@[self.hand, self.handShadow] rotateFrom:[self angleOfHandBySecond:_leftSecond] to:0 duration:0.35 timingFumction:STEaseOut completion:nil];
     
     _pause = NO;
     [self updateControlButtons];
@@ -192,10 +195,17 @@
 #pragma mark - time
 
 - (void)timeDown{
-    _leftSecond--;
-    self.timeLabel.text = [NSString stringWithFormat:@"%02ld:%02ld",_leftSecond/60,_leftSecond%60];
-    if (_canUpdateTimeDown){
-        [self.rulerView updateToSecond:_leftSecond];
+    
+    _leftTime--;
+    
+    NSInteger second = _leftSecond;
+    
+    _leftSecond = _leftTime/100;
+    
+    self.timeLabel.text = [NSString stringWithFormat:@"%02ld:%02ld.%02ld",_leftSecond/60,_leftSecond%60,_leftTime%100];
+    
+    if (_canUpdateTimeDown && second!=_leftSecond){
+        [self.rulerView setSecond:_leftSecond];
         [self updateHandWithSecond:_leftSecond];
     }
     if (_leftSecond == 0){
@@ -210,7 +220,7 @@
 }
 
 - (void)startTime{
-    _timer = [NSTimer timerWithTimeInterval:1 target:self selector:@selector(timeDown) userInfo:nil repeats:YES];
+    _timer = [NSTimer timerWithTimeInterval:1/100.0 target:self selector:@selector(timeDown) userInfo:nil repeats:YES];
     [[NSRunLoop mainRunLoop] addTimer:_timer forMode:NSDefaultRunLoopMode];
 }
 
@@ -219,14 +229,15 @@
 - (void)slideToSecond:(NSInteger)second{
     [self stopTime];
     [self updateHandWithSecond:second];
-    self.timeLabel.text = [NSString stringWithFormat:@"%02ld:00",second/60];
+    self.timeLabel.text = [NSString stringWithFormat:@"%02ld:00.00",second/60];
     [self animateControlButtonsToShow:second>0];
 }
 
 - (void)didBeginAtMinute:(NSInteger)minute{
     _leftSecond = minute*60;
+    _leftTime = _leftSecond*100;
     
-    self.timeLabel.text = [NSString stringWithFormat:@"%02ld:00",minute];
+    self.timeLabel.text = [NSString stringWithFormat:@"%02ld:00.00",minute];
     
     [@[self.hand, self.handShadow] rotateFrom:[self angleOfHandBySecond:_leftSecond] to:M_PI*2*(minute/60.0) duration:0.2 timingFumction:0 completion:nil];
     if (minute > 0 && !_pause){
@@ -253,7 +264,6 @@
                               duration:STCLOCK_ALPHA_ANIMATION_DURATION
                             completion:^(BOOL finished) {
                                 STSafeBlock(completion)
-                                _canUpdateTimeDown = YES;
                             }];
     
     [@[self.hand, self.handShadow] rotateFrom:POPLayerGetRotation(self.hand.layer) to:POPLayerGetRotation(self.hand.layer)+M_PI_2 duration:0.5 timingFumction:STEaseInOut completion:nil];
@@ -267,8 +277,10 @@
     [self animateUpdateControlButtonAlpha:STCLOCK_ALPHA_ANIMATION_DURATION];
     [@[self.hand, self.handShadow] rotateFrom:_handAngleBeforeShow to:[self angleOfHandBySecond:_leftSecond] duration:0.5 timingFumction:STCustomEaseOut completion:^(BOOL finished) {
         self.onWillShow = NO;
-        _canUpdateTimeDown = YES;
         STSafeBlock(completion)
+        if (finished){
+            _canUpdateTimeDown = YES;
+        }
     }];
 }
 

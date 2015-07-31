@@ -225,16 +225,16 @@
     [_rightButton positionTo:_rightButtonHidePosition duration:0.5 timingFumction:STEaseIn completion:nil];
     [_middleButton positionTo:_middleButtonHidePosition duration:0.5 timingFumction:STEaseIn completion:nil];
     
-    [@[self.secondHand, self.secondHandShadow] rotateFrom:0 to:M_PI_2 duration:0.4 timingFumction:STEaseIn completion:nil];
+    [@[self.secondHand, self.secondHandShadow] rotateFrom:POPLayerGetRotation(self.secondHand.layer) to:POPLayerGetRotation(self.secondHand.layer)+M_PI_2 duration:0.4 timingFumction:STEaseIn completion:nil];
     
 }
 - (void)transitionToShow:(void(^)())completion{
 
     [[self alphaAnimateItems] alphaTo:1 duration:STCLOCK_ALPHA_ANIMATION_DURATION completion:nil];
     
-    [_leftButton positionTo:_leftButtonOnPosition duration:0.6 timingFumction:STCustomEaseOut completion:nil];
-    [_rightButton positionTo:_rightButtonOffPosition duration:0.55 timingFumction:STCustomEaseOut completion:nil];
-    [_middleButton positionTo:_middleButtonPosition duration:0.5 timingFumction:STCustomEaseOut completion:nil];
+    [_leftButton positionTo:_leftButtonOnPosition duration:0.45 timingFumction:STCustomEaseOut completion:nil];
+    [_rightButton positionTo:_rightButtonOffPosition duration:0.4 timingFumction:STCustomEaseOut completion:nil];
+    [_middleButton positionTo:_middleButtonPosition duration:0.45 timingFumction:STCustomEaseOut completion:nil];
     
     [@[self.secondHand, self.secondHandShadow] rotateFrom:_handAngleBeforeShow to:0 duration:0.5 timingFumction:STEaseOut completion:^(BOOL finished) {
         self.onWillShow = NO;

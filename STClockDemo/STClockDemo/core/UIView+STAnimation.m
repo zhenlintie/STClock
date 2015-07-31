@@ -56,14 +56,13 @@ CAMediaTimingFunction *animateTimingFunction(STTimingFunctionType type){
         STSafeBlock(completion, f);
     }];
     a.removedOnCompletion = YES;
-    a.clampMode = kPOPAnimationClampBoth;
     [self.layer pop_addAnimation:a forKey:nil];
 }
 
 - (void)alphaTo:(CGFloat)alpha duration:(CGFloat)duration completion:(void (^)(BOOL))completion{
     [self animatePropertyName:kPOPLayerOpacity
                     fromValue:nil
-                      toValue:[NSNumber numberWithFloat:alpha]
+                      toValue:@(alpha)
                      duration:duration
                timingFumction:STEaseInOut
                    completion:completion];

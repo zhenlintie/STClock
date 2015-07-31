@@ -21,7 +21,7 @@
 
 @property (weak, nonatomic) id <STTimerRulerViewDelegate> delegate;
 
-- (void)updateToSecond:(NSInteger)second;
+@property (assign, nonatomic) NSInteger second;
 
 - (void)animateToShow;
 - (void)animateToHide;
