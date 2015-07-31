@@ -15,7 +15,7 @@
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         _sharedF = [NSDateFormatter new];
-        _sharedF.dateFormat = @"HH:mm:ss";
+        _sharedF.dateFormat = @"HH:mm:ss:SSS";
     });
     return _sharedF;
 }
@@ -34,6 +34,10 @@
 
 - (NSInteger)second{
     return [[self timeArray][2] integerValue];
+}
+
+- (NSInteger)nanoSecond{
+    return [[self timeArray][3] integerValue];
 }
 
 @end

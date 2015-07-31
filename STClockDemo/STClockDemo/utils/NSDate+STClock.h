@@ -13,5 +13,6 @@
 - (NSInteger)hour;
 - (NSInteger)minute;
 - (NSInteger)second;
+- (NSInteger)nanoSecond;
 
 @end

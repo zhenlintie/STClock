@@ -7,16 +7,19 @@
 //
 
 #import "STTimeManager.h"
+#import "NSDate+STClock.h"
 
 @interface STTimeManager ()
 
 @property (strong, nonatomic) NSMutableSet *timeObserverContainer;
 
-@property (strong, nonatomic) NSTimer *timer;
+@property (strong, nonatomic) CADisplayLink *timer;
 
 @end
 
-@implementation STTimeManager
+@implementation STTimeManager{
+    BOOL _onFire;
+}
 
 - (instancetype)init{
     return nil;
@@ -24,7 +27,7 @@
 
 - (instancetype)_init{
     if (self = [super init]){
-        _timer = [NSTimer timerWithTimeInterval:1 target:self selector:@selector(update) userInfo:nil repeats:YES];
+        _onFire = NO;
         _timeObserverContainer = [NSMutableSet set];
     }
     return self;
@@ -56,7 +59,11 @@
 }
 
 - (void)fire{
-    [[NSRunLoop mainRunLoop] addTimer:self.timer forMode:NSDefaultRunLoopMode];
+    if (!_onFire){
+        _onFire = YES;
+        self.timer = [CADisplayLink displayLinkWithTarget:self selector:@selector(update)];
+        [_timer addToRunLoop:[NSRunLoop mainRunLoop] forMode:NSDefaultRunLoopMode];
+    }
 }
 
 - (void)update{
@@ -64,7 +71,6 @@
         [obj performSelector:@selector(update) withObject:nil];
     }];
 }
-
 
 @end
 

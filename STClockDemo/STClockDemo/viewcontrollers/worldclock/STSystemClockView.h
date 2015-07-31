@@ -10,6 +10,8 @@
 
 @interface STSystemClockView : STClockView <STTimeObserver>
 
+@property (assign, nonatomic) BOOL updateHandBySecond;
+
 @property (strong, nonatomic) UILabel *titleLabel;
 
 @end

@@ -20,6 +20,13 @@
     CGPoint _rightEarPostion, _rightEarHidePosition;
 }
 
+- (instancetype)initWithFrame:(CGRect)frame{
+    if (self = [super initWithFrame:frame]){
+        self.updateHandBySecond = NO;
+    }
+    return self;
+}
+
 - (void)loadUI{
     [super loadUI];
     self.titleLabel.text = @"无闹钟";

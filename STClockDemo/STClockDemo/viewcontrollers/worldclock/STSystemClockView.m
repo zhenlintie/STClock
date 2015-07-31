@@ -38,6 +38,7 @@ typedef enum : NSUInteger {
     if (self = [super initWithFrame:frame]){
         [STTimeManager addTimeObserver:self];
         _canUpdateHand = NO;
+        _updateHandBySecond = YES;
     }
     return self;
 }
@@ -126,16 +127,18 @@ typedef enum : NSUInteger {
     NSInteger hour = [date hour];
     NSInteger minute = [date minute];
     NSInteger second = [date second];
+    NSInteger nanoSecond = [date nanoSecond];
     if (hour > 12){
         hour -= 12;
     }
     float hourRatio = hour/12.0;
     float minuteRatio = minute/60.0;
     float secondRatio = second/60.0;
+    float nanoSecondRatio = nanoSecond/1000.0;
     
     hourAngle = (2*M_PI*hourRatio)+(M_PI/6.0*minuteRatio);
     minuteAngle = 2*M_PI*minuteRatio+(M_PI/30.0*secondRatio);
-    secondAngle = 2*M_PI*secondRatio;
+    secondAngle = 2*M_PI*secondRatio + (_updateHandBySecond?0:M_PI/30.0*nanoSecondRatio);
     
     return @[@(hourAngle),@(minuteAngle),@(secondAngle)];
 } 
