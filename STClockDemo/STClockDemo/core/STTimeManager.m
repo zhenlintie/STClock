@@ -62,7 +62,7 @@
     if (!_onFire){
         _onFire = YES;
         self.timer = [CADisplayLink displayLinkWithTarget:self selector:@selector(update)];
-        [_timer addToRunLoop:[NSRunLoop mainRunLoop] forMode:NSDefaultRunLoopMode];
+        [_timer addToRunLoop:[NSRunLoop mainRunLoop] forMode:NSRunLoopCommonModes];
     }
 }
 

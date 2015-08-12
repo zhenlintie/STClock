@@ -221,7 +221,7 @@
 
 - (void)startTime{
     _timer = [NSTimer timerWithTimeInterval:1/100.0 target:self selector:@selector(timeDown) userInfo:nil repeats:YES];
-    [[NSRunLoop mainRunLoop] addTimer:_timer forMode:NSDefaultRunLoopMode];
+    [[NSRunLoop mainRunLoop] addTimer:_timer forMode:NSRunLoopCommonModes];
 }
 
 #pragma mark - ruler delegate
